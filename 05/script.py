@@ -35,29 +35,23 @@ def print_grid(grid):
 
 def draw_lines(inputs: List[InputRow], grid, include_diagonals=False):
     for i in inputs:
-        if i.start.x == i.end.x:
-            for y in range(min(i.start.y, i.end.y), max(i.start.y, i.end.y) + 1):
-                grid[y][i.start.x] += 1
-        elif i.start.y == i.end.y:
-            for x in range(min(i.start.x, i.end.x), max(i.start.x, i.end.x) + 1):
-                grid[i.start.y][x] += 1
-        elif include_diagonals:
-            print(f'Diagonal: {i}')
-            top_to_bottom = i.start.x < i.end.x
-            if not top_to_bottom:
-                old_start = i.start
-                i.start = i.end
-                i.end = old_start
-                
-            left_to_right = i.start.y < i.end.y
-            x = i.start.x
-            y = i.start.y
-            
-            while x <= i.end.x and (left_to_right and y <= i.end.y or not left_to_right and y >= i.end.y):
-                print(f"draw node {x},{y}")
-                grid[x][y] += 1
-                x += 1
-                y += 1 if left_to_right else -1
+    
+        if i.start.x != i.end.x and i.start.y != i.end.y and not include_diagonals:
+            continue
+
+        x = i.start.x
+        y = i.start.y
+
+        while True:            
+            grid[y][x] += 1
+
+            if x == i.end.x and y == i.end.y:
+                break
+            if not x == i.end.x:
+                x += 1 if i.end.x > x else -1
+            if not y == i.end.y:
+                y += 1 if i.end.y > y else -1
+
     return grid
 
 
@@ -70,13 +64,14 @@ def count_overlapping(grid):
     return overlapping
 
 os.chdir('05')
-with open("sample.txt", "r") as f:
+with open("input.txt", "r") as f:
     input = [line.rstrip() for line in f.readlines()]
     parsed_input = list(map(InputRow, input))
 
 def part1():
     grid = create_grid(parsed_input)
     grid = draw_lines(parsed_input, grid, False)
+    # print_grid(grid)
     overlapping = count_overlapping(grid)
     print(overlapping)
     
